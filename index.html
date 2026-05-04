@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unicode Homoglyph Swapper</title>
+    <title>BEST AI Humanizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap');
@@ -51,8 +51,8 @@
 <body class="min-h-screen p-4 md:p-8">
     <div class="max-w-4xl mx-auto">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Homoglyph Swapper</h1>
-            <p class="text-slate-600">Inject invisible differences into your text.</p>
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">AI Humanizer</h1>
+            <p class="text-slate-600">The best AI Humanizer that doesn't change your text.</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -63,9 +63,18 @@
                         <h2 class="font-semibold text-slate-700">Swap Intensity</h2>
                         <span id="percent-label" class="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">24%</span>
                     </div>
-                    <!-- Default set to 24 -->
                     <input type="range" id="probability" min="0" max="100" value="24" class="mb-2">
                     <p class="text-[11px] text-slate-400 italic">Determines the chance of each letter being replaced.</p>
+                </div>
+
+                <!-- Text Cleaning Settings -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="font-semibold text-slate-700 mb-4">Text Cleaning</h2>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="remove-em-dashes" checked onchange="processText()" class="w-4 h-4 rounded text-blue-600">
+                        <label for="remove-em-dashes" class="text-sm text-slate-600 select-none">Auto-fix Em Dashes (—)</label>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2 italic">Replaces long dashes with standard hyphens in the output.</p>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -77,7 +86,7 @@
                         </div>
                     </div>
                     <div id="settings-grid" class="grid grid-cols-3 gap-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -87,7 +96,7 @@
                     <textarea 
                         id="input-text" 
                         class="w-full h-32 p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
-                        placeholder="Type something..."
+                        placeholder="Type something here..."
                     ></textarea>
                 </div>
 
@@ -128,6 +137,7 @@
         const probSlider = document.getElementById('probability');
         const probLabel = document.getElementById('percent-label');
         const statCount = document.getElementById('stat-count');
+        const dashToggle = document.getElementById('remove-em-dashes');
 
         function initSettings() {
             Object.keys(homoglyphMap).sort().forEach(char => {
@@ -142,9 +152,15 @@
         }
 
         function processText() {
-            const text = inputEl.value;
+            let text = inputEl.value;
             const probability = probSlider.value / 100;
             probLabel.textContent = probSlider.value + "%";
+
+            // Automatically clean em-dashes if enabled
+            if (dashToggle.checked) {
+                text = text.replace(/—/g, '-');
+                text = text.replace(/–/g, '-'); // Also handle en-dashes
+            }
             
             const enabledChars = new Set();
             settingsGrid.querySelectorAll('input:checked').forEach(cb => enabledChars.add(cb.dataset.char));
@@ -153,7 +169,6 @@
             let count = 0;
 
             for (const char of text) {
-                // If it's a swappable character, enabled in settings, AND passes the random roll
                 if (enabledChars.has(char) && Math.random() < probability) {
                     result += homoglyphMap[char];
                     count++;
@@ -188,7 +203,7 @@
         inputEl.oninput = processText;
         window.onload = () => { 
             initSettings(); 
-            inputEl.value = "Hello World"; 
+            inputEl.value = "Welcome — this tool swaps letters."; 
             processText(); 
         };
     </script>
